@@ -1,0 +1,29 @@
+[Unit]
+Description=GCR Product Lister Service
+After=network.target
+
+[Service]
+# User and Group to run the service as.
+# Replace 'your_user' with the actual username.
+User=your_user
+Group=your_user
+
+# The working directory for the application.
+# Replace '/path/to/your/app' with the absolute path to the project directory.
+WorkingDirectory=/path/to/your/app
+
+# Environment variables for the application.
+# It's recommended to use a .env file or another secrets management tool for production.
+Environment="SHEET_NAME=your_sheet_name"
+Environment="INVALIDATE_TOKEN=your_super_secret_token"
+
+# The command to start the Gunicorn server.
+# This assumes that the virtual environment is located at /path/to/your/app/venv
+# and that the main Flask app object is in app/main.py
+ExecStart=/path/to/your/app/venv/bin/gunicorn --workers 3 --bind unix:gcr-spa.sock -m 007 app.main:app
+
+# Restart the service if it fails.
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
