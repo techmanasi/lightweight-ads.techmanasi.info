@@ -11,7 +11,7 @@ from functools import wraps
 
 # --- Configuration ---
 # Google Sheet details
-SHEET_NAME = os.environ.get("SHEET_NAME", "") # Or get from environment variable
+SHEET_NAME = os.environ.get("SHEET_NAME", "products") # Or get from environment variable
 # Credentials file for Google Sheets API
 # IMPORTANT: This file should be kept secret.
 # You can create this file from your Google Cloud Platform project.
@@ -123,7 +123,7 @@ def get_products_from_sheet():
     """
     Fetches product data from the Google Sheet.
     """
-    try:        
+    try:
         scope = ['https://spreadsheets.google.com/feeds', 'https://www.googleapis.com/auth/drive']
         creds = ServiceAccountCredentials.from_json_keyfile_name(CREDENTIALS_FILE, scope)
         client = gspread.authorize(creds)
@@ -132,13 +132,6 @@ def get_products_from_sheet():
         return products
     except Exception as e:
         print(f"Error fetching data from Google Sheet: {e}")
-        print(f"Error type: {type(e).__name__}")
-        print(f"Full error details: {str(e)}")
-        if hasattr(e, 'response'):
-            print(f"Response status: {e.response.status_code if hasattr(e.response, 'status_code') else 'N/A'}")
-            print(f"Response text: {e.response.text if hasattr(e.response, 'text') else 'N/A'}")
-        import traceback
-        print(f"Traceback: {traceback.format_exc()}")
         return None
 
 def add_product_to_sheet(product_data):
@@ -340,10 +333,6 @@ def api_add_product(current_user_email):
 
 
 if __name__ == '__main__':
-    # Validate required configuration
-    if not SHEET_NAME or SHEET_NAME.strip() == "":
-        raise ValueError("SHEET_NAME environment variable must be set and cannot be empty")
-    
     # Perform one-time setup of the Google Sheets
     setup_sheets()
     # The `get_products` call will pre-load the cache on startup.
