@@ -111,3 +111,61 @@ http://your_domain.com/api/invalidate-cache?token=your_secret_token
 ```
 
 This will clear the in-memory and file-based caches and trigger a background refresh from the Google Sheet.
+
+---
+
+## Deployment
+
+### Production (with Docker and Google Cloud Run)
+
+The recommended way to deploy this application is as a container on Google Cloud Run. This provides a scalable, serverless, and cost-effective production environment.
+
+#### 1. Prerequisites
+
+*   Install the [Google Cloud SDK](https://cloud.google.com/sdk/docs/install).
+*   Authenticate and initialize the SDK with `gcloud init`.
+*   Have a Google Cloud Project with the billing account set up.
+*   Enable the required APIs:
+    ```bash
+    gcloud services enable run.googleapis.com
+    gcloud services enable artifactregistry.googleapis.com
+    gcloud services enable cloudbuild.googleapis.com
+    gcloud services enable secretmanager.googleapis.com
+    ```
+
+#### 2. Securely Manage Secrets
+
+For production, you must not have your `client_secret.json` file or `JWT_SECRET_KEY` in the source code. Use Google Cloud's Secret Manager.
+
+1.  **Store the JWT Secret Key**:
+    *   Choose a strong, random string for your JWT secret.
+    *   Create the secret in Secret Manager:
+        ```bash
+        gcloud secrets create jwt-secret-key
+        printf "YOUR-SUPER-SECRET-KEY" | gcloud secrets versions add jwt-secret-key --data-file=-
+        ```
+
+2.  **Store the Google Sheets Credentials**:
+    *   Create another secret for the `client_secret.json` file:
+        ```bash
+        gcloud secrets create google-client-secret
+        gcloud secrets versions add google-client-secret --data-file="client_secret.json"
+        ```
+
+#### 3. Build and Deploy
+
+The included `Dockerfile` will be used by Cloud Build to create a container image of the application.
+
+Run the following command to build and deploy the application. Replace `[YOUR_REGION]` with your desired GCP region (e.g., `us-central1`).
+
+```bash
+gcloud run deploy lightweight-product-spa \
+  --source . \
+  --platform managed \
+  --region [YOUR_REGION] \
+  --allow-unauthenticated \
+  --update-secrets=JWT_SECRET_KEY=jwt-secret-key:latest,GOOGLE_APPLICATION_CREDENTIALS=google-client-secret:latest \
+  --set-env-vars=SHEET_NAME=your_sheet_name,INVALIDATE_TOKEN=your_secret_token
+```
+
+This command builds the container, pushes it to Artifact Registry, and deploys it to Cloud Run, securely injecting your secrets as environment variables. After deployment, `gcloud` will provide a public URL for your service.
