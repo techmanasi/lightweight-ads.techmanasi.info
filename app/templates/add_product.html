@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Product - Product Lister</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <header>
+        <h1>Add a New Product</h1>
+    </header>
+    <main>
+        <form id="add-product-form" style="max-width: 600px; margin: auto; padding: 20px; border: 1px solid #ccc; border-radius: 5px;">
+            <div id="message" style="margin-bottom: 10px;"></div>
+            <div style="margin-bottom: 15px;">
+                <label for="name">Product Name</label>
+                <input type="text" id="name" name="name" required>
+            </div>
+            <div style="margin-bottom: 15px;">
+                <label for="image_url">Image URL</label>
+                <input type="url" id="image_url" name="image_url" required>
+            </div>
+            <div style="margin-bottom: 15px;">
+                <label for="purchase_link">Purchase Link</label>
+                <input type="url" id="purchase_link" name="purchase_link" required>
+            </div>
+            <div style="margin-bottom: 15px;">
+                <label for="description">Description</label>
+                <textarea id="description" name="description" rows="4"></textarea>
+            </div>
+            <div style="margin-bottom: 15px;">
+                <label for="tags">Tags (comma-separated)</label>
+                <input type="text" id="tags" name="tags">
+            </div>
+            <button type="submit">Add Product</button>
+        </form>
+        <div style="text-align: center; margin-top: 20px;">
+            <a href="/">Back to Product List</a>
+        </div>
+    </main>
+    <script src="{{ url_for('static', filename='add_product.js') }}"></script>
+</body>
+</html>
